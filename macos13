@@ -1,0 +1,12 @@
+name: macOS Ventura SSH
+
+on:
+  workflow_dispatch:
+
+jobs:
+  macos:
+    runs-on: macos-13
+
+    steps:
+      - name: Start SSH via tmate
+        uses: mxschmitt/action-tmate@v3
