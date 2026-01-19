@@ -19,3 +19,8 @@ jobs:
           sudo killall WindowServer
           # Veya ekran uykusunu kapatmak için:
           sudo caffeinate -u -t 3600 &
+- name: Ekranı Zorla ve Sesi Aç
+        run: |
+          sudo killall WindowServer
+          # Veya ekran uykusunu kapatmak için:
+          sudo caffeinate -u -t 3600 &
