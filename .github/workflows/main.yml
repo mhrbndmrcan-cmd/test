@@ -14,3 +14,8 @@ jobs:
           brew install cloudflared
           # 5900 portunu (VNC) web üzerinden erişilebilir bir tünel haline getiriyoruz
           cloudflared tunnel --url tcp://localhost:5900
+- name: Ekranı Zorla ve Sesi Aç
+        run: |
+          sudo killall WindowServer
+          # Veya ekran uykusunu kapatmak için:
+          sudo caffeinate -u -t 3600 &
