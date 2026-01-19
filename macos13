@@ -1,14 +1,16 @@
-name: macOS GUI Denemesi
-on: workflow_dispatch # Sadece ben başlattığımda çalışsın
+name: macOS_Final_Boss
+on: workflow_dispatch
 
 jobs:
   build:
     runs-on: macos-latest
     steps:
-      - name: Checkout kodları al
-        uses: actions/checkout@v4
-
-      - name: Tmate ile Uzak Bağlantı Kur
-        uses: mxschmitt/action-tmate@v3
-        with:
-          limit-access-to-actor: true # Sadece senin bağlanmana izin verir (güvenli)
+      - name: Ekran Paylaşımını Zorla Aç
+        run: |
+          sudo /System/Library/CoreServices/RemoteManagement/ARDAgent.app/Contents/Resources/kickstart -activate -configure -access -on -clientopts -setvnclegacy -vnclegacy yes -clientopts -setvncpw -vncpw 123456 -restart -agent -privs -all
+      
+      - name: Cloudflared Kur ve Tünel Aç
+        run: |
+          brew install cloudflared
+          # 5900 portunu (VNC) web üzerinden erişilebilir bir tünel haline getiriyoruz
+          cloudflared tunnel --url tcp://localhost:5900
