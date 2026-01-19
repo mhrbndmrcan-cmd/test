@@ -1,12 +1,14 @@
-name: macOS Ventura SSH
-
-on:
-  workflow_dispatch:
+name: macOS GUI Denemesi
+on: workflow_dispatch # Sadece ben başlattığımda çalışsın
 
 jobs:
-  macos:
-    runs-on: macos-13
-
+  build:
+    runs-on: macos-latest
     steps:
-      - name: Start SSH via tmate
+      - name: Checkout kodları al
+        uses: actions/checkout@v4
+
+      - name: Tmate ile Uzak Bağlantı Kur
         uses: mxschmitt/action-tmate@v3
+        with:
+          limit-access-to-actor: true # Sadece senin bağlanmana izin verir (güvenli)
