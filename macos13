@@ -1,16 +1,35 @@
-name: macOS_Final_Boss
-on: workflow_dispatch
+name: macOS Uzak Masaustu
+
+on:
+  workflow_dispatch: # Sadece siz butona bastiginizda calisir
 
 jobs:
   build:
-    runs-on: macos-latest
+    runs-on: macos-13 # Intel tabanli macOS (VNC destegi daha stabildir)
+
     steps:
-      - name: Ekran Paylaşımını Zorla Aç
+      - name: Ekran Paylasimini (VNC) Aktif Et
         run: |
-          sudo /System/Library/CoreServices/RemoteManagement/ARDAgent.app/Contents/Resources/kickstart -activate -configure -access -on -clientopts -setvnclegacy -vnclegacy yes -clientopts -setvncpw -vncpw 123456 -restart -agent -privs -all
-      
-      - name: Cloudflared Kur ve Tünel Aç
+          sudo defaults write /Library/Preferences/com.apple.RemoteManagement VNC-Only -bool true
+          sudo defaults write /Library/Preferences/com.apple.RemoteManagement VNCOnly -bool true
+          # VNC Giris sifresini belirliyoruz (Sifre: 123456)
+          sudo /System/Library/CoreServices/RemoteManagement/ARDAgent.app/Contents/Resources/kickstart \
+            -activate -configure -access -on -restart -agent -privs -all \
+            -clientopts -setvnclegacy -vnclegacy yes -setvncpw -vncpw 123456
+
+      - name: ngrok Kur ve Baglantiyi Baslat
+        env:
+          NGROK_AUTH_TOKEN: ${{ secrets.NGROK_AUTH_TOKEN }}
         run: |
-          brew install cloudflared
-          # 5900 portunu (VNC) web üzerinden erişilebilir bir tünel haline getiriyoruz
-          cloudflared tunnel --url tcp://localhost:5900
+          brew install ngrok/ngrok/ngrok
+          ngrok config add-authtoken $NGROK_AUTH_TOKEN
+          # Port 5900 (macOS VNC portu) icin tunel ac
+          ngrok tcp 5900 --log=stdout > ngrok.log &
+          sleep 5
+          # Baglanti adresini ekrana yazdir
+          curl -s http://localhost:4040/api/tunnels | jq -r '.tunnels[0].public_url'
+
+      - name: Sunucuyu Acik Tut (Maksimum 6 Saat)
+        run: |
+          echo "Baglanti hazir! Log ekranindaki ngrok adresini VNC Viewer'a yapistirin."
+          sleep 21600
